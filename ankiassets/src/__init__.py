@@ -19,22 +19,20 @@ import aqt
 
 class Asset:
     CSS = "css"
-    CSS_EXT = f".{CSS}"
     JS = "js"
-    JS_EXT = f".{JS}"
 
 
-class AnkiGlobalAssets:
+class AnkiAssets:
 
-    name = "AnkiGlobalAssets"
+    name = "AnkiAssets"
     preferences_name = f"{name} Preferences"
     preferences_menu_name = f"{preferences_name}..."
     preferences_menu_shortcut = "ctrl+shift+g"
 
-    # [/absolute/path/to/addons]/ankiglobalassets
+    # [/absolute/path/to/addons]/ankiassets
     root = pathlib.Path(__file__).parent.parent
 
-    user_root = root / "user_files"
+    user_root = root / "user_files_dev"
     user_assets_path = user_root / "assets"
     user_assets_css_path = user_root / "assets" / Asset.CSS
     user_assets_js_path = user_root / "assets" / Asset.JS
@@ -45,21 +43,23 @@ class AnkiGlobalAssets:
     # in this manner may then be accessed under the `/_addons` subpath.
     #
     # via https://github.com/ankitects/anki/blob/3d7f643184cf9625293a397e1a73109659b77734/qt/aqt/webview.py#L132
-    web_exports_root = pathlib.Path("/_addons") / root.name / "user_files" / "assets"
+    web_exports_root = (
+        pathlib.Path("/_addons") / root.name / "user_files_dev" / "assets"
+    )
 
-    # /_addons/ankiglobalassets/user_files/assets/css
+    # /_addons/ankiassets/user_files/assets/css
     web_exports_assets_css_path = web_exports_root / Asset.CSS
 
-    # /_addons/ankiglobalassets/user_files/assets/js
+    # /_addons/ankiassets/user_files/assets/js
     web_exports_assets_js_path = web_exports_root / Asset.JS
 
     def __init__(self) -> None:
 
-        self._config = Config(addon=self)
-        self._preferences_dialog = PreferencesDialog(addon=self, parent=aqt.mw)
+        self._config = AnkiAssetsConfig(addon=self)
+        self._preferences = AnkiAssetsPreferences(addon=self, parent=aqt.mw)
 
     @property
-    def config(self) -> "Config":
+    def config(self) -> "AnkiAssetsConfig":
         return self._config
 
     @property
@@ -105,8 +105,8 @@ class AnkiGlobalAssets:
             if filename.startswith("_"):
                 continue
 
-            # [/absolute/path/to/addons]/ankiglobalassets/user_files/assets/css/[asset-name].css --> [asset-name].css
-            # [/absolute/path/to/addons]/ankiglobalassets/user_files/assets/js/[asset-name].js --> [asset-name].js
+            # [/absolute/path/to/addons]/ankiassets/user_files/assets/css/[asset-name].css --> [asset-name].css
+            # [/absolute/path/to/addons]/ankiassets/user_files/assets/js/[asset-name].js --> [asset-name].js
             yield str(path.relative_to(assets_path))
 
     def _append_preferences_menu(self) -> None:
@@ -115,12 +115,12 @@ class AnkiGlobalAssets:
         action.setText(self.preferences_menu_name)
         action.setShortcut(self.preferences_menu_shortcut)
 
-        action.triggered.connect(self._preferences_dialog.show)
+        action.triggered.connect(self._preferences.show)
 
         aqt.mw.form.menuTools.addAction(action)
 
     def setup(self) -> None:
-        """ This function defines and connects AnkiGlobalAssets to Anki. Hooks
+        """ This function defines and connects AnkiAssets to Anki. Hooks
         are prefixed with `hook__`. """
 
         self._append_preferences_menu()
@@ -151,7 +151,7 @@ class AnkiGlobalAssets:
                 if not enabled:
                     continue
 
-                # /_addons/ankiglobalassets/user_files/assets/css/[asset-name].css
+                # /_addons/ankiassets/user_files/assets/css/[asset-name].css
                 path = str(self.web_exports_assets_css_path / css_asset)
                 web_content.css.append(path)
 
@@ -160,14 +160,14 @@ class AnkiGlobalAssets:
                 if not enabled:
                     continue
 
-                # /_addons/ankiglobalassets/user_files/assets/js/[asset-name].js
+                # /_addons/ankiassets/user_files/assets/js/[asset-name].js
                 path = str(self.web_exports_assets_js_path / js_asset)
                 web_content.js.append(path)
 
         aqt.gui_hooks.webview_will_set_content.append(hook__append_css)
 
 
-class PreferencesDialog(aqt.qt.QDialog):
+class AnkiAssetsPreferences(aqt.qt.QDialog):
 
     _minimum_width = 384
 
@@ -262,14 +262,14 @@ class PreferencesDialog(aqt.qt.QDialog):
         super().show()
 
 
-class Config:
+class AnkiAssetsConfig:
 
     __config: Dict[str, Dict[str, bool]] = {
         Asset.CSS: {},
         Asset.JS: {},
     }
 
-    """ Config data structure.
+    """ AnkiAssetsConfig data structure.
 
         {
             "css": {
@@ -312,7 +312,7 @@ class Config:
             self._build_config()
         except json.JSONDecodeError:
             aqt.utils.showInfo(
-                f"{self._addon.name}: Error loading config... Config "
+                f"{self._addon.name}: Error loading config... AnkiAssetsConfig "
                 f"re-built.\n Please confirm setting by going to Tools > "
                 f"{self._addon.preferences_menu_name}"
             )
@@ -342,26 +342,26 @@ class Config:
         deleted_assets = []
 
         # Make a list of all assets currently in the `user_files/[asset_type]`
-        # directory that have no entries in `Config.__config`.
+        # directory that have no entries in `AnkiAssetsConfig.__config`.
         for asset in user_assets:
             if asset in self.__config[asset_type].keys():
                 continue
             new_assets.append(asset)
 
-        # Make a list of all assets in `Config.__config` that are not in the
+        # Make a list of all assets in `AnkiAssetsConfig.__config` that are not in the
         # `user_files/[asset_type]` directory.
         for asset in self.__config[asset_type].keys():
             if asset in user_assets:
                 continue
             deleted_assets.append(asset)
 
-        # Add all the newly added assets to `Config.__config` and set their value
+        # Add all the newly added assets to `AnkiAssetsConfig.__config` and set their value
         # to `True`. Meaning the asset is enabled and will be appended to all
         # card templates.
         for new_asset in new_assets:
             self.__config[asset_type][new_asset] = True
 
-        # Remove all the deleted assets from `Config.__config`.
+        # Remove all the deleted assets from `AnkiAssetsConfig.__config`.
         for deleted_asset in deleted_assets:
             del self.__config[asset_type][deleted_asset]
 

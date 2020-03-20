@@ -1,7 +1,7 @@
 import sys
 
-from .src import AnkiGlobalAssets
+from .src import AnkiAssets
 
 
-addon = AnkiGlobalAssets()
+addon = AnkiAssets()
 addon.setup()
