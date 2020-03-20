@@ -32,7 +32,7 @@ class AnkiAssets:
     # [/absolute/path/to/addons]/ankiassets
     root = pathlib.Path(__file__).parent.parent
 
-    user_root = root / "user_files_dev"
+    user_root = root / "user_files"
     user_assets_path = user_root / "assets"
     user_assets_css_path = user_root / "assets" / Asset.CSS
     user_assets_js_path = user_root / "assets" / Asset.JS
@@ -43,9 +43,7 @@ class AnkiAssets:
     # in this manner may then be accessed under the `/_addons` subpath.
     #
     # via https://github.com/ankitects/anki/blob/3d7f643184cf9625293a397e1a73109659b77734/qt/aqt/webview.py#L132
-    web_exports_root = (
-        pathlib.Path("/_addons") / root.name / "user_files_dev" / "assets"
-    )
+    web_exports_root = pathlib.Path("/_addons") / root.name / "user_files" / "assets"
 
     # /_addons/ankiassets/user_files/assets/css
     web_exports_assets_css_path = web_exports_root / Asset.CSS
