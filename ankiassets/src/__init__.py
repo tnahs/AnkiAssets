@@ -15,6 +15,8 @@ import aqt
 #           `user_assets_css`
 #           `user_assets_js`
 #           etc.
+# TODO: Add `reload assets` button in Preferences.
+# TODO: Add message in `clayout` that there are loaded assets.
 
 
 class Asset:
@@ -123,7 +125,7 @@ class AnkiAssets:
 
         self._append_preferences_menu()
 
-        def hook__append_css(
+        def hook__append_assets(
             web_content: aqt.webview.WebContent, context: Optional[Any]
         ) -> None:
 
@@ -162,7 +164,7 @@ class AnkiAssets:
                 path = str(self.web_exports_assets_js_path / js_asset)
                 web_content.js.append(path)
 
-        aqt.gui_hooks.webview_will_set_content.append(hook__append_css)
+        aqt.gui_hooks.webview_will_set_content.append(hook__append_assets)
 
 
 class AnkiAssetsPreferences(aqt.qt.QDialog):
@@ -325,7 +327,7 @@ class AnkiAssetsConfig:
             asset_type=Asset.CSS, user_assets=self._addon.user_assets_css
         )
         self._update_config_by_type(
-            asset_type=Asset.CSS, user_assets=self._addon.user_assets_css
+            asset_type=Asset.JS, user_assets=self._addon.user_assets_js
         )
 
         self._save_config()
