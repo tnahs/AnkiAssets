@@ -7,18 +7,6 @@ from . import config, preferences
 from .defaults import Asset
 
 
-# TODO: Documentation!
-# TODO: Clean up inter-class API.
-# TODO: Clearer variable names
-#           `user_assets_config_css`
-#           `user_assets_config_js`
-#           `user_assets_css`
-#           `user_assets_js`
-#           etc.
-# TODO: Add `reload assets` button in Preferences.
-# TODO: Add message in `clayout` that there are loaded assets.
-
-
 class AnkiAssets:
 
     name = "AnkiAssets"
