@@ -1,9 +1,0 @@
-TODO: Documentation!
-TODO: Clean up inter-class API.
-TODO: Style `Preferences` window.
-TODO: Clearer variable names.
-    user_assets_config_css, user_assets_config_js,
-    user_assets_css, user_assets_js etc
-TODO: Is it possible to reload assets without re-opening Anki?
-TODO: Add `Open Assets Folder` button in `Preferences`.
-TODO: Add message in `clayout` that there are loaded assets.

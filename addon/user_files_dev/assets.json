@@ -1,0 +1,9 @@
+{
+    "css": {
+        "field.css": true,
+        "card.css": true
+    },
+    "js": {
+        "card.js": false
+    }
+}

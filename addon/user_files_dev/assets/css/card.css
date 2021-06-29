@@ -1,0 +1,9 @@
+@import "_normalize.css";
+
+.card {
+  background-color: red;
+}
+
+.card.nightMode {
+  background-color: blue;
+}
