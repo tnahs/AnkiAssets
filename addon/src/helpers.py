@@ -7,9 +7,7 @@ import aqt
 
 class Key:
     USER_FILES = (
-        "user_files"
-        if not os.environ.get("ANKI_ADDON_DEV", False)
-        else "user_files_dev"
+        "user_files" if "ANKI_ADDON_DEV" not in os.environ else "user_files_dev"
     )
     ASSETS_JSON = "assets.json"
     ASSETS = "assets"
@@ -22,7 +20,9 @@ class E_Asset(str, Enum):
 
 class Defaults:
     NAME = "AnkiAssets"
-    NAME_INTERNAL = aqt.mw.addonManager.addonFromModule(__name__)
+    NAME_INTERNAL = (
+        aqt.mw.addonManager.addonFromModule(__name__) if aqt.mw is not None else NAME
+    )
 
     PREFERENCES_NAME = f"{NAME} Preferences"
     PREFERENCES_MENU_NAME = f"{PREFERENCES_NAME}..."

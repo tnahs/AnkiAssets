@@ -44,7 +44,7 @@ class AnkiAssets:
     @staticmethod
     def iter_assets(type: E_Asset, path: pathlib.Path) -> Iterator[str]:
 
-        # "ext" --> "*.ext"
+        # "ext" --> "**/*.ext"
         asset_glob = f"**/*.{type.value}"
 
         for item in path.glob(asset_glob):
@@ -74,7 +74,7 @@ class AnkiAssets:
         action.setShortcut(Defaults.PREFERENCES_MENU_SHORTCUT)
         action.triggered.connect(self.__preferences_view.show)
 
-        aqt.mw.form.menuTools.addAction(action)
+        aqt.mw.form.menuTools.addAction(action)  # type: ignore
 
         def hook__append_assets(
             web_content: WebContent, context: Optional[Any]
@@ -94,7 +94,7 @@ class AnkiAssets:
             # > from aqt import mw
             # > mw.addonManager.setWebExports(__name__, r"web/.*(css|js)")
 
-            aqt.mw.addonManager.setWebExports(
+            aqt.mw.addonManager.setWebExports(  # type: ignore
                 __name__, fr"{Key.USER_FILES}{os.sep}{Key.ASSETS}{os.sep}.*"
             )
 

@@ -15,6 +15,7 @@ from PyQt5.QtWidgets import (
 
 from .helpers import Defaults, E_Asset
 
+
 if TYPE_CHECKING:
     from .addon import AnkiAssets
 

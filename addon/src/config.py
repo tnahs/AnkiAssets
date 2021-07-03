@@ -3,11 +3,13 @@ from typing import TYPE_CHECKING, Dict, List, Tuple
 
 from .helpers import Defaults, E_Asset
 
+
 if TYPE_CHECKING:
     from .addon import AnkiAssets
 
 
 class Config:
+
     """
     Data structure:
         {
