@@ -90,7 +90,7 @@ class PreferencesView(QDialog):
         button__open_assets_folder.clicked.connect(
             functools.partial(
                 QDesktopServices.openUrl,
-                QUrl(f"file:///{Defaults.ASSETS_PATH}"),
+                QUrl(f"file:///{Defaults.ASSETS}"),
             )
         )
 

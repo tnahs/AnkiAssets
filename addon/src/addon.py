@@ -5,6 +5,7 @@ from typing import Any, Iterator, Optional, Tuple
 import aqt
 import aqt.gui_hooks
 from aqt.clayout import CardLayout
+from aqt.previewer import BrowserPreviewer
 from aqt.reviewer import Reviewer
 from aqt.webview import WebContent
 from PyQt5.QtWidgets import QAction
@@ -29,7 +30,7 @@ class AnkiAssets:
             return tuple(
                 self.iter_assets(
                     type=E_Asset.CSS,
-                    path=Defaults.ASSETS_CSS_PATH,
+                    path=Defaults.ASSETS_CSS,
                 )
             )
 
@@ -37,7 +38,7 @@ class AnkiAssets:
             return tuple(
                 self.iter_assets(
                     type=E_Asset.JS,
-                    path=Defaults.ASSETS_JS_PATH,
+                    path=Defaults.ASSETS_JS,
                 )
             )
 
@@ -80,7 +81,7 @@ class AnkiAssets:
             web_content: WebContent, context: Optional[Any]
         ) -> None:
 
-            if not isinstance(context, (CardLayout, Reviewer)):
+            if not isinstance(context, (CardLayout, BrowserPreviewer, Reviewer)):
                 return
 
             # Add-ons may expose their own web assets by utilizing
@@ -104,7 +105,7 @@ class AnkiAssets:
                     continue
 
                 # /_addons/[addon-name]/user_files/assets/css/[relative/path/to/asset].css
-                path = str(Defaults.WEB_ASSETS_CSS_PATH / css)
+                path = str(Defaults.WEB_ASSETS_CSS / css)
 
                 web_content.css.append(path)
 
@@ -114,7 +115,7 @@ class AnkiAssets:
                     continue
 
                 # /_addons/[addon-name]/user_files/assets/js/[relative/path/to/asset].js
-                path = str(Defaults.WEB_ASSETS_JS_PATH / js)
+                path = str(Defaults.WEB_ASSETS_JS / js)
 
                 web_content.js.append(path)
 
