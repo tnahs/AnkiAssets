@@ -20,30 +20,8 @@ class AnkiAssets:
         self.__config = Config(addon=self)
         self.__preferences_view = PreferencesView(addon=self, parent=aqt.mw)
 
-    @property
-    def config(self) -> Config:
-        return self.__config
-
-    def assets(self, type: E_Asset) -> Tuple[str, ...]:
-
-        if type == E_Asset.CSS:
-            return tuple(
-                self.iter_assets(
-                    type=E_Asset.CSS,
-                    path=Defaults.ASSETS_CSS,
-                )
-            )
-
-        if type == E_Asset.JS:
-            return tuple(
-                self.iter_assets(
-                    type=E_Asset.JS,
-                    path=Defaults.ASSETS_JS,
-                )
-            )
-
     @staticmethod
-    def iter_assets(type: E_Asset, path: pathlib.Path) -> Iterator[str]:
+    def __iter_assets(type: E_Asset, path: pathlib.Path) -> Iterator[str]:
 
         # "ext" --> "**/*.ext"
         asset_glob = f"**/*.{type.value}"
@@ -67,6 +45,24 @@ class AnkiAssets:
             # [/absolute/path/to/css]/nested/base.css --> nested/base.css
             # [/absolute/path/to/js]/nested/base.js --> nested/base.js
             yield str(item.relative_to(path))
+
+    def assets(self, type: E_Asset) -> Tuple[str, ...]:
+
+        if type == E_Asset.CSS:
+            return tuple(
+                self.__iter_assets(
+                    type=E_Asset.CSS,
+                    path=Defaults.ASSETS_CSS,
+                )
+            )
+
+        if type == E_Asset.JS:
+            return tuple(
+                self.__iter_assets(
+                    type=E_Asset.JS,
+                    path=Defaults.ASSETS_JS,
+                )
+            )
 
     def setup(self) -> None:
 
@@ -120,3 +116,7 @@ class AnkiAssets:
                 web_content.js.append(path)
 
         aqt.gui_hooks.webview_will_set_content.append(hook__append_assets)
+
+    @property
+    def config(self) -> Config:
+        return self.__config

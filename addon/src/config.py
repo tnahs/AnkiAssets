@@ -14,15 +14,11 @@ class Config:
     Data structure:
         {
             "css": {
-                "a.css": True,
-                "b.css": True,
-                "c.css": True,
+                "base.css": True,
                 ...
             },
             "js": {
-                "a.js": True,
-                "b.js": True,
-                "c.js": True,
+                "base.js": True,
                 ...
             }
         }
@@ -39,24 +35,6 @@ class Config:
 
         self.__addon = addon
         self.__load()
-
-    @property
-    def css(self) -> List[Tuple[str, bool]]:
-        return sorted(
-            self.__data[E_Asset.CSS.value].items(),
-            key=lambda t: t[0],
-        )
-
-    @property
-    def js(self) -> List[Tuple[str, bool]]:
-        return sorted(
-            self.__data[E_Asset.JS.value].items(),
-            key=lambda t: t[0],
-        )
-
-    def toggle(self, type: E_Asset, name: str) -> None:
-        self.__data[type.value][name] = not self.__data[type.value][name]
-        self.__save()
 
     def __load(self) -> None:
 
@@ -118,3 +96,21 @@ class Config:
             return
 
         self.__data = self.__data_default.copy()
+
+    def toggle_asset(self, type: E_Asset, name: str) -> None:
+        self.__data[type.value][name] = not self.__data[type.value][name]
+        self.__save()
+
+    @property
+    def css(self) -> List[Tuple[str, bool]]:
+        return sorted(
+            self.__data[E_Asset.CSS.value].items(),
+            key=lambda t: t[0],
+        )
+
+    @property
+    def js(self) -> List[Tuple[str, bool]]:
+        return sorted(
+            self.__data[E_Asset.JS.value].items(),
+            key=lambda t: t[0],
+        )

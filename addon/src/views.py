@@ -47,7 +47,7 @@ class PreferencesView(QDialog):
             checkbox.setChecked(state)
             checkbox.toggled.connect(
                 functools.partial(
-                    self.__addon.config.toggle,
+                    self.__addon.config.toggle_asset,
                     type=E_Asset.CSS,
                     name=name,
                 )
@@ -72,7 +72,7 @@ class PreferencesView(QDialog):
             checkbox.setChecked(state)
             checkbox.toggled.connect(
                 functools.partial(
-                    self.__addon.config.toggle,
+                    self.__addon.config.toggle_asset,
                     type=E_Asset.JS,
                     name=name,
                 )
