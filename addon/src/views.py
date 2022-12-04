@@ -1,16 +1,18 @@
+from __future__ import annotations
+
 import functools
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 from aqt.main import AnkiQt
 from aqt.qt.qt6 import (
-    QUrl,
-    QDesktopServices,
-    QFontDatabase,
     QCheckBox,
+    QDesktopServices,
     QDialog,
+    QFontDatabase,
     QGroupBox,
     QHBoxLayout,
     QPushButton,
+    QUrl,
     QVBoxLayout,
 )
 
@@ -22,7 +24,7 @@ if TYPE_CHECKING:
 
 
 class PreferencesView(QDialog):
-    def __init__(self, addon: "AnkiAssets", parent: Optional[AnkiQt]) -> None:
+    def __init__(self, addon: "AnkiAssets", parent: AnkiQt | None) -> None:
         super().__init__(parent)
 
         self.__addon = addon

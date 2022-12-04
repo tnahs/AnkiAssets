@@ -1,14 +1,16 @@
+from __future__ import annotations
+
 import os
 import pathlib
-from typing import Any, Iterator, Optional, Tuple
+from collections.abc import Iterator
 
 import aqt
 import aqt.gui_hooks
 from aqt.clayout import CardLayout
 from aqt.previewer import BrowserPreviewer
+from aqt.qt.qt6 import QAction
 from aqt.reviewer import Reviewer
 from aqt.webview import WebContent
-from aqt.qt.qt6 import QAction
 
 from .config import Config
 from .helpers import Defaults, E_Asset, Key
@@ -46,7 +48,7 @@ class AnkiAssets:
             # [/absolute/path/to/js]/nested/base.js --> nested/base.js
             yield str(item.relative_to(path))
 
-    def assets(self, type: E_Asset) -> Tuple[str, ...]:
+    def assets(self, type: E_Asset) -> tuple[str, ...]:
 
         if type == E_Asset.CSS:
             return tuple(
@@ -74,10 +76,11 @@ class AnkiAssets:
         aqt.mw.form.menuTools.addAction(action)  # type: ignore
 
         def hook__append_assets(
-            web_content: WebContent, context: Optional[Any]
+            web_content: WebContent,
+            context: BrowserPreviewer | CardLayout | Reviewer | None,
         ) -> None:
 
-            if not isinstance(context, (CardLayout, BrowserPreviewer, Reviewer)):
+            if not isinstance(context, (BrowserPreviewer, CardLayout, Reviewer)):
                 return
 
             # Add-ons may expose their own web assets by utilizing

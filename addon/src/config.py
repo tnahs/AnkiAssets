@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import json
 from typing import TYPE_CHECKING, Dict, List, Tuple
 
@@ -24,7 +26,7 @@ class Config:
         }
     """
 
-    __data_default: Dict[str, Dict[str, bool]] = {
+    __data_default: dict[str, dict[str, bool]] = {
         E_Asset.CSS.value: {},
         E_Asset.JS.value: {},
     }
@@ -39,7 +41,7 @@ class Config:
     def __load(self) -> None:
 
         try:
-            with open(Defaults.ASSETS_JSON, "r") as f:
+            with open(Defaults.ASSETS_JSON) as f:
                 self.__data = json.load(f)
         except Exception:
             self.__build()
@@ -102,14 +104,14 @@ class Config:
         self.__save()
 
     @property
-    def css(self) -> List[Tuple[str, bool]]:
+    def css(self) -> list[tuple[str, bool]]:
         return sorted(
             self.__data[E_Asset.CSS.value].items(),
             key=lambda t: t[0],
         )
 
     @property
-    def js(self) -> List[Tuple[str, bool]]:
+    def js(self) -> list[tuple[str, bool]]:
         return sorted(
             self.__data[E_Asset.JS.value].items(),
             key=lambda t: t[0],
