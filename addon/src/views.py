@@ -2,9 +2,10 @@ import functools
 from typing import TYPE_CHECKING, Optional
 
 from aqt.main import AnkiQt
-from PyQt5.QtCore import QUrl
-from PyQt5.QtGui import QDesktopServices, QFontDatabase
-from PyQt5.QtWidgets import (
+from aqt.qt.qt6 import (
+    QUrl,
+    QDesktopServices,
+    QFontDatabase,
     QCheckBox,
     QDialog,
     QGroupBox,
@@ -31,7 +32,7 @@ class PreferencesView(QDialog):
 
         self.setWindowTitle(Defaults.PREFERENCES_NAME)
 
-        font__monospace = QFontDatabase.systemFont(QFontDatabase.FixedFont)
+        font__monospace = QFontDatabase.systemFont(QFontDatabase.SystemFont.FixedFont)
         font__monospace.setPointSize(14)
 
         # CSS

@@ -6,7 +6,7 @@ root=${0:A:h:h}
 cd "$root/addon"
 
 zip  \
-    --recurse-paths ../bundle/anki-assets.ankiaddon . \
+    --recurse-paths ../bundle/AnkiAssets.ankiaddon . \
     --exclude "**/.*" \
     --include \
         "./src/**.py" \

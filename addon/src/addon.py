@@ -8,7 +8,7 @@ from aqt.clayout import CardLayout
 from aqt.previewer import BrowserPreviewer
 from aqt.reviewer import Reviewer
 from aqt.webview import WebContent
-from PyQt5.QtWidgets import QAction
+from aqt.qt.qt6 import QAction
 
 from .config import Config
 from .helpers import Defaults, E_Asset, Key
@@ -92,7 +92,7 @@ class AnkiAssets:
             # > mw.addonManager.setWebExports(__name__, r"web/.*(css|js)")
 
             aqt.mw.addonManager.setWebExports(  # type: ignore
-                __name__, fr"{Key.USER_FILES}{os.sep}{Key.ASSETS}{os.sep}.*"
+                __name__, rf"{Key.USER_FILES}{os.sep}{Key.ASSETS}{os.sep}.*"
             )
 
             for css, enabled in self.config.css:

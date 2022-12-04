@@ -1,8 +1,8 @@
-# anki-assets
+# AnkiAssets
 
 ## Installation
 
-Download and run `bundle/anki-assets.ankiaddon`.
+Download and run `bundle/AnkiAssets.ankiaddon`.
 
 ## Usage
 
