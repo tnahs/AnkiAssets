@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import functools
-from typing import TYPE_CHECKING
 
 from aqt.main import AnkiQt
 from aqt.qt.qt6 import (
@@ -9,112 +8,137 @@ from aqt.qt.qt6 import (
     QDesktopServices,
     QDialog,
     QFontDatabase,
+    QGraphicsOpacityEffect,
     QGroupBox,
     QHBoxLayout,
+    QLabel,
     QPushButton,
     QUrl,
     QVBoxLayout,
 )
 
-from .helpers import Defaults, E_Asset
-
-
-if TYPE_CHECKING:
-    from .addon import AnkiAssets
+from .config import Config
+from .helpers import Asset, Defaults, Paths
 
 
 class PreferencesView(QDialog):
-    def __init__(self, addon: "AnkiAssets", parent: AnkiQt | None) -> None:
+    def __init__(self, config: Config, parent: AnkiQt | None) -> None:
         super().__init__(parent)
 
-        self.__addon = addon
-        self.__init_ui()
+        self._config = config
+        self._init_ui()
 
-    def __init_ui(self) -> None:
+    def _init_ui(self) -> None:
 
         self.setWindowTitle(Defaults.PREFERENCES_NAME)
 
-        font__monospace = QFontDatabase.systemFont(QFontDatabase.SystemFont.FixedFont)
-        font__monospace.setPointSize(14)
+        font_monospace = QFontDatabase.systemFont(QFontDatabase.SystemFont.FixedFont)
+        font_monospace.setPointSize(12)
 
         # CSS
 
-        layout__css = QVBoxLayout()
-        layout__css.setContentsMargins(12, 10, 10, 10)
-        layout__css.setSpacing(5)
+        layout_css = QVBoxLayout()
+        layout_css.setContentsMargins(12, 10, 10, 10)
+        layout_css.setSpacing(15)
 
-        for name, state in self.__addon.config.css:
+        css_assets = self._config.get_assets(asset_type=Asset.CSS)
 
-            checkbox = QCheckBox(f"css/{name}")
-            checkbox.setFont(font__monospace)
-            checkbox.setChecked(state)
-            checkbox.toggled.connect(
-                functools.partial(
-                    self.__addon.config.toggle_asset,
-                    type=E_Asset.CSS,
-                    name=name,
+        if not css_assets:
+
+            effect = QGraphicsOpacityEffect()
+            effect.setOpacity(0.25)
+
+            label_css = QLabel("No CSS loaded...")
+            label_css.setGraphicsEffect(effect)
+
+            layout_css.addWidget(label_css)
+
+        else:
+
+            for name, state in css_assets:
+
+                checkbox = QCheckBox(name)
+                checkbox.setFont(font_monospace)
+                checkbox.setChecked(state)
+                checkbox.toggled.connect(
+                    functools.partial(
+                        self._config.toggle_asset,
+                        asset_type=Asset.CSS,
+                        name=name,
+                    )
                 )
-            )
 
-            layout__css.addWidget(checkbox)
+                layout_css.addWidget(checkbox)
 
-        group__css = QGroupBox("CSS:")
-        group__css.setLayout(layout__css)
-        group__css.setFont(font__monospace)
+        group_css = QGroupBox("CSS:")
+        group_css.setLayout(layout_css)
 
-        # JS
+        # JavaScript
 
-        layout__js = QVBoxLayout()
-        layout__js.setContentsMargins(12, 10, 10, 10)
-        layout__js.setSpacing(5)
+        layout_javascript = QVBoxLayout()
+        layout_javascript.setContentsMargins(12, 10, 10, 10)
+        layout_javascript.setSpacing(5)
 
-        for name, state in self.__addon.config.js:
+        javascript_assets = self._config.get_assets(asset_type=Asset.JAVASCRIPT)
 
-            checkbox = QCheckBox(f"js/{name}")
-            checkbox.setFont(font__monospace)
-            checkbox.setChecked(state)
-            checkbox.toggled.connect(
-                functools.partial(
-                    self.__addon.config.toggle_asset,
-                    type=E_Asset.JS,
-                    name=name,
+        if not javascript_assets:
+
+            effect = QGraphicsOpacityEffect()
+            effect.setOpacity(0.25)
+
+            label_javascript = QLabel("No JavaScript loaded...")
+            label_javascript.setGraphicsEffect(effect)
+
+            layout_javascript.addWidget(label_javascript)
+
+        else:
+
+            for name, state in javascript_assets:
+
+                checkbox = QCheckBox(name)
+                checkbox.setFont(font_monospace)
+                checkbox.setChecked(state)
+                checkbox.toggled.connect(
+                    functools.partial(
+                        self._config.toggle_asset,
+                        asset_type=Asset.JAVASCRIPT,
+                        name=name,
+                    )
                 )
-            )
 
-            layout__js.addWidget(checkbox)
+                layout_javascript.addWidget(checkbox)
 
-        group__js = QGroupBox("JS:")
-        group__js.setLayout(layout__js)
-        group__js.setFont(font__monospace)
+        group_javascript = QGroupBox("JavaScript:")
+        group_javascript.setLayout(layout_javascript)
 
         # Buttons
 
-        button__open_assets_folder = QPushButton("Open AnkiAssets Folder...")
-        button__open_assets_folder.clicked.connect(
+        button_open_assets_folder = QPushButton("Open AnkiAssets Folder...")
+        button_open_assets_folder.clicked.connect(
             functools.partial(
                 QDesktopServices.openUrl,
-                QUrl(f"file:///{Defaults.ASSETS}"),
+                QUrl(f"file:///{Paths.ASSETS_ROOT}"),
             )
         )
 
-        button__close = QPushButton("Close")
-        button__close.clicked.connect(self.close)
+        button_close = QPushButton("Close")
+        button_close.clicked.connect(self.close)
 
-        layout__buttons = QHBoxLayout()
-        layout__buttons.addWidget(button__open_assets_folder)
-        layout__buttons.addStretch()
-        layout__buttons.addWidget(button__close)
+        layout_buttons = QHBoxLayout()
+        layout_buttons.addWidget(button_open_assets_folder)
+        layout_buttons.addStretch()
+        layout_buttons.addWidget(button_close)
 
         # Main Layout
 
         layout = QVBoxLayout()
         layout.setSpacing(0)
         layout.setContentsMargins(20, 20, 20, 20)
-        layout.addWidget(group__css)
+        layout.addWidget(group_css)
         layout.addSpacing(10)
-        layout.addWidget(group__js)
+        layout.addWidget(group_javascript)
         layout.addSpacing(15)
-        layout.addLayout(layout__buttons)
+        layout.addLayout(layout_buttons)
 
         self.setLayout(layout)
         self.setStyleSheet(

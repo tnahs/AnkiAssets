@@ -1,84 +1,43 @@
 from __future__ import annotations
 
 import os
-import pathlib
-from collections.abc import Iterator
 
 import aqt
 import aqt.gui_hooks
+from aqt.browser.previewer import BrowserPreviewer
 from aqt.clayout import CardLayout
-from aqt.previewer import BrowserPreviewer
 from aqt.qt.qt6 import QAction
 from aqt.reviewer import Reviewer
 from aqt.webview import WebContent
 
 from .config import Config
-from .helpers import Defaults, E_Asset, Key
+from .helpers import Asset, Defaults, Key, Paths
 from .views import PreferencesView
 
 
 class AnkiAssets:
     def __init__(self) -> None:
-        self.__config = Config(addon=self)
-        self.__preferences_view = PreferencesView(addon=self, parent=aqt.mw)
-
-    @staticmethod
-    def __iter_assets(type: E_Asset, path: pathlib.Path) -> Iterator[str]:
-
-        # "ext" --> "**/*.ext"
-        asset_glob = f"**/*.{type.value}"
-
-        for item in path.glob(asset_glob):
-
-            # Ignore directories.
-            if item.is_dir():
-                continue
-
-            # Ignore hidden files.
-            if item.name.startswith("."):
-                continue
-
-            # Ignore private files.
-            if item.name.startswith("_"):
-                continue
-
-            # [/absolute/path/to/css]/base.css --> base.css
-            # [/absolute/path/to/js]/base.js --> base.js
-            # [/absolute/path/to/css]/nested/base.css --> nested/base.css
-            # [/absolute/path/to/js]/nested/base.js --> nested/base.js
-            yield str(item.relative_to(path))
-
-    def assets(self, type: E_Asset) -> tuple[str, ...]:
-
-        if type == E_Asset.CSS:
-            return tuple(
-                self.__iter_assets(
-                    type=E_Asset.CSS,
-                    path=Defaults.ASSETS_CSS,
-                )
-            )
-
-        if type == E_Asset.JS:
-            return tuple(
-                self.__iter_assets(
-                    type=E_Asset.JS,
-                    path=Defaults.ASSETS_JS,
-                )
-            )
+        self._config = Config()
+        self._preferences_view = PreferencesView(config=self._config, parent=aqt.mw)
 
     def setup(self) -> None:
+
+        if aqt.mw is None:
+            return
 
         action = QAction(aqt.mw)
         action.setText(Defaults.PREFERENCES_MENU_NAME)
         action.setShortcut(Defaults.PREFERENCES_MENU_SHORTCUT)
-        action.triggered.connect(self.__preferences_view.show)
+        action.triggered.connect(self._preferences_view.show)
 
-        aqt.mw.form.menuTools.addAction(action)  # type: ignore
+        aqt.mw.form.menuTools.addAction(action)
 
         def hook__append_assets(
-            web_content: WebContent,
-            context: BrowserPreviewer | CardLayout | Reviewer | None,
+            web_content: WebContent, context: object | None
         ) -> None:
+
+            if aqt.mw is None:
+                return
 
             if not isinstance(context, (BrowserPreviewer, CardLayout, Reviewer)):
                 return
@@ -87,39 +46,35 @@ class AnkiAssets:
             # aqt.addons.AddonManager.setWebExports(). Web exports registered
             # in this manner may then be accessed under the `/_addons` subpath.
             #
-            # E.g., to allow access to a `my-addon.js` and `my-addon.css` residing
-            # in a "web" subfolder in your add-on package, first register the
-            # corresponding web export:
+            # E.g., to allow access to a `my-addon.js` and `my-addon.css`
+            # residing in a "web" subfolder in your add-on package, first
+            # register the corresponding web export:
             #
             # > from aqt import mw
             # > mw.addonManager.setWebExports(__name__, r"web/.*(css|js)")
 
-            aqt.mw.addonManager.setWebExports(  # type: ignore
+            aqt.mw.addonManager.setWebExports(
                 __name__, rf"{Key.USER_FILES}{os.sep}{Key.ASSETS}{os.sep}.*"
             )
 
-            for css, enabled in self.config.css:
+            for css, enabled in self._config.get_assets(Asset.CSS):
 
                 if enabled is False:
                     continue
 
-                # /_addons/[addon-name]/user_files/assets/css/[relative/path/to/asset].css
-                path = str(Defaults.WEB_ASSETS_CSS / css)
+                # /_addons/[addon-name]/user_files/assets/css/asset.css
+                path = str(Paths.WEB_ASSETS_CSS_ROOT / css)
 
                 web_content.css.append(path)
 
-            for js, enabled in self.config.js:
+            for javascript, enabled in self._config.get_assets(Asset.JAVASCRIPT):
 
                 if enabled is False:
                     continue
 
-                # /_addons/[addon-name]/user_files/assets/js/[relative/path/to/asset].js
-                path = str(Defaults.WEB_ASSETS_JS / js)
+                # /_addons/[addon-name]/user_files/assets/javascript/asset.js
+                path = str(Paths.WEB_ASSETS_JAVASCRIPT_ROOT / javascript)
 
                 web_content.js.append(path)
 
         aqt.gui_hooks.webview_will_set_content.append(hook__append_assets)
-
-    @property
-    def config(self) -> Config:
-        return self.__config

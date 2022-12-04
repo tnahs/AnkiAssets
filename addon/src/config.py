@@ -1,13 +1,9 @@
 from __future__ import annotations
 
 import json
-from typing import TYPE_CHECKING, Dict, List, Tuple
+from collections.abc import Iterator
 
-from .helpers import Defaults, E_Asset
-
-
-if TYPE_CHECKING:
-    from .addon import AnkiAssets
+from .helpers import Asset, Extension, Paths
 
 
 class Config:
@@ -19,100 +15,129 @@ class Config:
                 "base.css": True,
                 ...
             },
-            "js": {
+            "javascript": {
                 "base.js": True,
                 ...
             }
         }
     """
 
-    __data_default: dict[str, dict[str, bool]] = {
-        E_Asset.CSS.value: {},
-        E_Asset.JS.value: {},
+    __DATA: dict[str, dict[str, bool]] = {
+        Asset.CSS.value: {},
+        Asset.JAVASCRIPT.value: {},
     }
 
-    __data = __data_default.copy()
+    _data = __DATA.copy()
 
-    def __init__(self, addon: "AnkiAssets"):
+    def __init__(self) -> None:
+        self._load()
 
-        self.__addon = addon
-        self.__load()
+    def toggle_asset(self, asset_type: Asset, name: str) -> None:
+        self._data[asset_type.value][name] = not self._data[asset_type.value][name]
+        self._write()
 
-    def __load(self) -> None:
+    def get_assets(self, asset_type: Asset) -> list[tuple[str, bool]]:
+        return sorted(
+            self._data[asset_type.value].items(),
+            key=lambda t: t[0],
+        )
+
+    def _load(self) -> None:
 
         try:
-            with open(Defaults.ASSETS_JSON) as f:
-                self.__data = json.load(f)
+            with open(Paths.ASSETS_JSON) as f:
+                self._data = json.load(f)
         except Exception:
-            self.__build()
-            self.__save()
+            self._build()
+            self._write()
             return
 
-        self.__update()
-        self.__save()
+        self._update()
+        self._write()
 
-    def __save(self) -> None:
+    def _build(self) -> None:
 
-        with open(Defaults.ASSETS_JSON, "w") as f:
-            json.dump(self.__data, f, indent=4)
+        self._validate()
 
-    def __build(self) -> None:
+        for asset_type in list(Asset):
+            for asset in self._iter_assets(asset_type=asset_type):
+                self._data[asset_type.value][asset] = True
 
-        self.__check()
+    def _update(self):
 
-        for type in list(E_Asset):
-            for asset in self.__addon.assets(type=type):
-                self.__data[type.value][asset] = True
+        self._validate()
 
-    def __update(self):
-
-        self.__check()
-
-        for type in list(E_Asset):
+        for asset_type in list(Asset):
 
             # Add new assets.
 
             new_assets = [
-                new_asset
-                for new_asset in self.__addon.assets(type=type)
-                if new_asset not in self.__data[type.value]
+                asset
+                for asset in self._iter_assets(asset_type=asset_type)
+                if asset not in self._data[asset_type.value]
             ]
 
             for new_asset in new_assets:
-                self.__data[type.value][new_asset] = True
+                self._data[asset_type.value][new_asset] = True
 
             # Remove deleted assets.
 
             deleted_assets = [
-                deleted_asset
-                for deleted_asset in self.__data[type.value]
-                if deleted_asset not in self.__addon.assets(type=type)
+                asset
+                for asset in self._data[asset_type.value]
+                if asset not in tuple(self._iter_assets(asset_type=asset_type))
             ]
 
             for deleted_asset in deleted_assets:
-                del self.__data[type.value][deleted_asset]
+                del self._data[asset_type.value][deleted_asset]
 
-    def __check(self) -> None:
+    def _write(self, backup=False) -> None:
 
-        if self.__data:
-            return
+        path = Paths.ASSETS_JSON if backup is False else Paths.ASSETS_JSON_BAK
 
-        self.__data = self.__data_default.copy()
+        with open(path, "w") as f:
+            json.dump(self._data, f, indent=4)
 
-    def toggle_asset(self, type: E_Asset, name: str) -> None:
-        self.__data[type.value][name] = not self.__data[type.value][name]
-        self.__save()
+    def _validate(self) -> None:
 
-    @property
-    def css(self) -> list[tuple[str, bool]]:
-        return sorted(
-            self.__data[E_Asset.CSS.value].items(),
-            key=lambda t: t[0],
-        )
+        try:
+            for asset_type in list(Asset):
+                self._data[asset_type.value]
+        except KeyError:
+            self._write(backup=True)
+            self._data = self.__DATA.copy()
 
-    @property
-    def js(self) -> list[tuple[str, bool]]:
-        return sorted(
-            self.__data[E_Asset.JS.value].items(),
-            key=lambda t: t[0],
-        )
+    @staticmethod
+    def _iter_assets(asset_type: Asset) -> Iterator[str]:
+
+        if asset_type == Asset.CSS:
+            path = Paths.ASSETS_CSS_ROOT
+            extension = Extension.CSS.value
+        elif asset_type == Asset.JAVASCRIPT:
+            path = Paths.ASSETS_JAVASCRIPT_ROOT
+            extension = Extension.JAVASCRIPT.value
+        else:
+            raise ValueError("invalid value for 'asset_type'")
+
+        # "ext" --> "**/*.ext"
+        asset_glob = f"**/*.{extension}"
+
+        for item in path.glob(asset_glob):
+
+            # Ignore directories.
+            if item.is_dir():
+                continue
+
+            # Ignore hidden files.
+            if item.name.startswith("."):
+                continue
+
+            # Ignore private files.
+            if item.name.startswith("_"):
+                continue
+
+            # [path-to-css]/base.css        --> base.css
+            # [path-to-css]/nested/base.css --> nested/base.css
+            # [path-to-js]/base.js          --> base.js
+            # [path-to-js]/nested/base.js   --> nested/base.js
+            yield str(item.relative_to(path))

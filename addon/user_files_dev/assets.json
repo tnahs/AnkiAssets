@@ -3,7 +3,7 @@
         "field.css": true,
         "card.css": true
     },
-    "js": {
-        "card.js": false
+    "javascript": {
+        "card.js": true
     }
 }
