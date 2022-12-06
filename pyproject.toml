@@ -1,3 +1,9 @@
+[project]
+name = "AnkiAssets"
+description = "Load global CSS and JavaScript files for your Anki cards!"
+version = "0.3.0"
+authors = [{ name = "Shant Ergenian", email = "shaaant@pm.me" }]
+
 [tool.isort]
 profile = "black"
 lines_after_imports = 2

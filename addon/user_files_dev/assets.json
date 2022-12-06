@@ -1,7 +1,7 @@
 {
     "css": {
-        "field.css": true,
-        "card.css": true
+        "card.css": true,
+        "field.css": true
     },
     "javascript": {
         "card.js": true

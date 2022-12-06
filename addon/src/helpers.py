@@ -5,11 +5,15 @@ from enum import Enum
 import aqt
 
 
-def is_development_mode():
+def is_development_mode() -> bool:
+    """Returns a bool for whether or not the the add-on is being developed."""
+
     return "ANKI_ADDON_DEVELOPMENT" in os.environ
 
 
 class Defaults:
+    """A class defining all the add-on's default values."""
+
     NAME = "AnkiAssets"
 
     # This name is used for properly setting the path to where the web exports
@@ -23,57 +27,84 @@ class Defaults:
     PREFERENCES_NAME = f"{NAME} Preferences"
     PREFERENCES_MENU_NAME = f"{PREFERENCES_NAME}..."
     PREFERENCES_MENU_SHORTCUT = "Ctrl+Shift+G"
-    PREFERENCES_MINIMUM_WIDTH = 384
 
 
 class Key:
+    """A class defining re-usable strings."""
+
     ASSETS = "assets"
     ASSETS_JSON = "assets.json"
     USER_FILES = "user_files" if not is_development_mode() else "user_files_dev"
 
 
-class Asset(str, Enum):
-    CSS = "css"
-    JAVASCRIPT = "javascript"
-
-
-class Extension(str, Enum):
-    CSS = "css"
-    JAVASCRIPT = "js"
-
-
 class Paths:
+    """
+    A class defining all the add-on's paths.
 
-    # addons21/[addon-name]
-    # ├── src/
-    # └── user_files
-    #     ├── assets.json
-    #     └── assets
-    #         ├── css
-    #         │   └── ...
-    #         └── javascript
-    #             └── ...
-    #
-    # [path-to-addon]
+    The add-on's directory structure is as follows:
+
+    addons21/[addon-name] (1)
+    ├── src/
+    └── user_files (2)
+        ├── assets (3)
+        │   ├── css
+        │   │   └── ...
+        │   └── javascript
+        │       └── ...
+        └── assets.json (4)
+    """
+
+    # (1) The path to the add-on's root directory.
     ADDON_ROOT = pathlib.Path(__file__).parent.parent
-    # [path-to-addon]/user_files
-    USER_FILES_ROOT = ADDON_ROOT / Key.USER_FILES
-    # [path-to-addon]/user_files/assets.json
-    ASSETS_JSON = USER_FILES_ROOT / Key.ASSETS_JSON
-    # [path-to-addon]/user_files/assets.json
-    ASSETS_JSON_BAK = USER_FILES_ROOT / f"{Key.ASSETS_JSON}.bak"
-    # [path-to-addon]/user_files/assets
-    ASSETS_ROOT = USER_FILES_ROOT / Key.ASSETS
-    # [path-to-addon]/user_files/assets/css
-    ASSETS_CSS_ROOT = ASSETS_ROOT / Asset.CSS.value
-    # [path-to-addon]/user_files/assets/javascript
-    ASSETS_JAVASCRIPT_ROOT = ASSETS_ROOT / Asset.JAVASCRIPT.value
 
-    # /_addons
-    WEB_ROOT = pathlib.Path("/_addons")
-    # /_addons/[addon-name]/user_files/assets
-    WEB_ASSETS_ROOT = WEB_ROOT / Defaults.NAME_INTERNAL / Key.USER_FILES / Key.ASSETS
-    # /_addons/[addon-name]/user_files/assets/css
-    WEB_ASSETS_CSS_ROOT = WEB_ASSETS_ROOT / Asset.CSS.value
-    # /_addons/[addon-name]/user_files/assets/javascript
-    WEB_ASSETS_JAVASCRIPT_ROOT = WEB_ASSETS_ROOT / Asset.JAVASCRIPT.value
+    # (2) The path to the add-on's `user_files` directory.
+    # --> [path-to-addon]/user_files
+    USER_FILES_ROOT = ADDON_ROOT / Key.USER_FILES
+
+    # (3) The path to the add-on's assets root directory.
+    # --> [path-to-addon]/user_files/assets
+    ASSETS_ROOT = USER_FILES_ROOT / Key.ASSETS
+
+    # (4) The path to the add-on's `asset.json` and `asset.json.bak` files.
+    # --> [path-to-addon]/user_files/assets.json
+    ASSETS_JSON = USER_FILES_ROOT / Key.ASSETS_JSON
+    # --> [path-to-addon]/user_files/assets.json.bak
+    ASSETS_JSON_BAK = USER_FILES_ROOT / f"{Key.ASSETS_JSON}.bak"
+
+    # The path to the add-on's web exports root directory.
+    # --> /_addons/[addon-name]/user_files/assets
+    WEB_ASSETS_ROOT = (
+        pathlib.Path("/")
+        / "_addons"
+        / Defaults.NAME_INTERNAL
+        / Key.USER_FILES
+        / Key.ASSETS
+    )
+
+
+class Asset(Enum):
+    """An Enum representing all possible asset types."""
+
+    CSS = ("css", "CSS", "css")
+    JAVASCRIPT = ("javascript", "JavaScript", "js")
+
+    # When an `Enum` is created, the value of the variant, in this case a tuple, is
+    # passed into the `__init__` method. Note, however that creating an enum does
+    # not require calling it e.g. `Asset()`. Accessing the variant i.e. `Asset.CSS`
+    # instantiates it. Accessing one of the attributes is like any other e.g.
+    # `Asset.CSS.label`.
+    #
+    # https://stackoverflow.com/a/70325042/16968574
+    def __init__(self, id: str, label: str, extension: str):
+
+        self.id = id
+        self.label = label
+        self.extension = extension
+
+        # The path to the asset on disk.
+        # --> [path-to-addon]/user_files/assets/[label]
+        self.asset_root = Paths.ASSETS_ROOT / label
+
+        # The path to the asset in the web exports directory.
+        # --> /_addons/[addon-name]/user_files/assets/[label]
+        self.web_asset_root = Paths.WEB_ASSETS_ROOT / label
