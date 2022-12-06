@@ -29,8 +29,8 @@ class Config:
     """
 
     __DATA: dict[str, dict[str, bool]] = {
-        Asset.CSS.label: {},
-        Asset.JAVASCRIPT.label: {},
+        Asset.CSS.id: {},
+        Asset.JAVASCRIPT.id: {},
     }
 
     _data = __DATA.copy()
