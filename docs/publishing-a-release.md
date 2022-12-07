@@ -8,8 +8,7 @@
     - `addon/manifest.json`
     - `addon/__init__.py`
 
-4. Run `black`, `isort` and `flake8`.
-5. Push changes:
+4. Push changes:
 
     ```shell
     git add .
@@ -17,7 +16,7 @@
     git push origin master
     ```
 
-6. Tag the last commit:
+5. Tag the last commit:
 
     ```shell
     git tag [VERSION]
@@ -30,6 +29,6 @@
     > 2. Create a draft release in GitHub.
     > 3. Upload the bundle to the draft release.
 
-7. Add release notes and publish the draft release.
+6. Add release notes and publish the draft release.
 
     💡 The tag and title should be `[VERSION]`.
