@@ -3,14 +3,17 @@
 # https://unix.stackexchange.com/a/115431
 root=${0:A:h:h}
 
+mkdir "$root/bundle"
+
 cd "$root/addon"
 
-zip  \
-    --recurse-paths ../bundle/AnkiAssets.ankiaddon . \
-    --exclude "**/.*" \
-    --include \
-        "./src/**.py" \
-        "./src/assets/**" \
-        "./__init__.py" \
-        "./user_files/**" \
+zip                                       \
+    "$root/bundle/AnkiAssets.ankiaddon" * \
+    --recurse-paths                       \
+    --exclude "**/.*"                     \
+    --include                             \
+        "./src/**.py"                     \
+        "./src/assets/**"                 \
+        "./__init__.py"                   \
+        "./user_files/**"                 \
         "./manifest.json"
