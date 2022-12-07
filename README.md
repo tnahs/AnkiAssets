@@ -78,8 +78,8 @@ Download and run the latest [`AnkiAssets.ankiaddon`][releases] release.
 
     ```shell
     python -m venv .venv
-    pip install --upgrade pip
     source .venv/bin/activate
+    pip install --upgrade pip
     ```
 
 5. Install required packages:
