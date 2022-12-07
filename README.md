@@ -4,7 +4,7 @@ Load global CSS and JavaScript files for your Anki cards!
 
 ## Installation
 
-Download and run `bundle/AnkiAssets.ankiaddon`.
+Download and run the latest [`AnkiAssets.ankiaddon`][releases] release.
 
 ## Usage
 
@@ -107,3 +107,4 @@ Download and run `bundle/AnkiAssets.ankiaddon`.
 
 [anki-dev]: https://github.com/ankitects/anki/blob/main/docs/development.md
 [env-var]: https://github.com/ankitects/anki/blob/main/docs/development.md#environmental-variables
+[releases]: https://github.com/tnahs/AnkiAssets/releases
