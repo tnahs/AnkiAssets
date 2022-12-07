@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import os
 import pathlib
 
 import aqt
@@ -12,7 +11,7 @@ from aqt.reviewer import Reviewer
 from aqt.webview import WebContent
 
 from .config import Config
-from .helpers import Asset, Defaults, Key, Paths
+from .helpers import Asset, Defaults, Key
 from .views import PreferencesView
 
 

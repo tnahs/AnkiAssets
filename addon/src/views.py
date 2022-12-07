@@ -1,16 +1,12 @@
 from __future__ import annotations
 
 import functools
-import textwrap
-from typing import Type, TypeVar
 
 from aqt.main import AnkiQt
 from aqt.qt.qt6 import (
-    QWIDGETSIZE_MAX,
     QCheckBox,
     QDesktopServices,
     QDialog,
-    QFont,
     QFontDatabase,
     QGraphicsOpacityEffect,
     QGroupBox,
