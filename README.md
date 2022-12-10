@@ -105,6 +105,12 @@ Download and run the latest [`AnkiAssets.ankiaddon`][releases] release.
     export DISABLE_QT5_COMPAT=1
     ```
 
+7. Run Anki from the terminal.
+
+    ```shell
+    anki
+    ```
+
 [anki-dev]: https://github.com/ankitects/anki/blob/main/docs/development.md
 [env-var]: https://github.com/ankitects/anki/blob/main/docs/development.md#environmental-variables
 [releases]: https://github.com/tnahs/AnkiAssets/releases
