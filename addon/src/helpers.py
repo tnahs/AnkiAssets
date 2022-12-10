@@ -38,8 +38,7 @@ class Key:
 
 
 class Paths:
-    """
-    A class defining all the add-on's paths.
+    """A class defining all the add-on's paths.
 
     The add-on's directory structure is as follows:
 

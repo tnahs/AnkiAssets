@@ -7,8 +7,7 @@ from .helpers import Asset, Paths
 
 
 class Config:
-    """
-    A class used to store and mutate the add-on's configuration.
+    """A class used to store and mutate the add-on's configuration.
 
     Three public methods are available: one for toggling an asset's enabled state, one
     for retrieving the all the name and enabled states for a specific asset type, and
@@ -106,8 +105,7 @@ class Config:
                 del self._data[asset_type.id][deleted_asset]
 
     def _write(self, backup=False) -> None:
-        """
-        Writes the configuration to disk. Optionally writes a back-up instead.
+        """Writes the configuration to disk. Optionally writes a back-up instead.
 
         Args:
             backup: Writes a copy of the configuration with a `.bak` extension. This
@@ -121,10 +119,10 @@ class Config:
             json.dump(self._data, f, indent=4)
 
     def _validate(self) -> None:
-        """
-        Performs a shallow validation of the add-on's config. In the case of an
-        error, the current configuration is backed up to disk and the default
-        configuration is used in its place.
+        """Performs a shallow validation of the add-on's config.
+
+        In the case of an error, the current configuration is backed up to disk and the
+        default configuration is used in its place.
         """
 
         try:
@@ -136,20 +134,19 @@ class Config:
 
     @staticmethod
     def _iter_assets_directory(asset_type: Asset) -> Iterator[str]:
-        """
-        Iterates through all the assets for a give asset type within the
+        """Iterates through all the assets for a give asset type within the
         `user_files/assets` directory and returns its path relative to the asset's
         respective root directory. For example:
 
-            user_files/assets/css/card.css        --> card.css
-            user_files/assets/css/nested/card.css --> nested/card.css
-                              ^^^
-            CSS root ─────────┘
+        user_files/assets/css/card.css        --> card.css
+        user_files/assets/css/nested/card.css --> nested/card.css
+                          ^^^
+        CSS root ─────────┘
 
-            user_files/assets/javascript/card.js        --> card.js
-            user_files/assets/javascript/nested/card.js --> nested/card.js
-                              ^^^^^^^^^^
-            JavaScript root ──┘
+        user_files/assets/javascript/card.js        --> card.js
+        user_files/assets/javascript/nested/card.js --> nested/card.js
+                          ^^^^^^^^^^
+        JavaScript root ──┘
         """
 
         path = asset_type.asset_root

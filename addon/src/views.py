@@ -193,7 +193,10 @@ class PreferencesView(QDialog):
 
     @staticmethod
     def _open_assets_directory() -> None:
-        """Opens the root assets directory. Creates it if it doesn't exist."""
+        """Opens the root assets directory.
+
+        Creates it if it doesn't exist.
+        """
 
         Paths.ASSETS_ROOT.mkdir(parents=True, exist_ok=True)
         QDesktopServices.openUrl(QUrl(f"file:///{Paths.ASSETS_ROOT}"))
