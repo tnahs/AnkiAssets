@@ -7,3 +7,9 @@ authors = [{ name = "Shant Ergenian", email = "shaaant@pm.me" }]
 [tool.isort]
 profile = "black"
 lines_after_imports = 2
+
+[tool.docformatter]
+in-place = true
+recursive = true
+wrap-summaries = 88
+wrap-descriptions = 88
