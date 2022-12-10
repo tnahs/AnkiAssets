@@ -56,9 +56,6 @@ class AnkiAssets:
             web_content: WebContent, context: object | None
         ) -> None:
 
-            if aqt.mw is None:
-                return
-
             # The context can be from any of these three web views.
             if not isinstance(context, (BrowserPreviewer, CardLayout, Reviewer)):
                 return
