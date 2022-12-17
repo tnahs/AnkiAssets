@@ -21,7 +21,8 @@ class AnkiAssets:
         self._preferences_view = PreferencesView(config=self._config, parent=aqt.mw)
 
     def setup(self) -> None:
-        """Creates the addon's menu item and appends its required hooks."""
+        """Creates the addon's menu item and registers its hook used to append user-
+        created assets."""
 
         if aqt.mw is None:
             return
