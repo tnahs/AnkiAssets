@@ -52,6 +52,10 @@ Download and run the latest [`AnkiAssets.ankiaddon`][releases] release.
 └────────────────────────────────────────────┘
 ```
 
+## Example Config
+
+An example config can be found at: [tnahs/anki-addon-configs:AnkiAssets][anki-assets-config].
+
 ## Development
 
 1. Install the required `[python-version]`. See the [Anki development][anki-dev]
@@ -111,6 +115,7 @@ Download and run the latest [`AnkiAssets.ankiaddon`][releases] release.
     anki
     ```
 
+[anki-assets-config]: https://github.com/tnahs/anki-addon-configs/tree/AnkiAssets
 [anki-dev]: https://github.com/ankitects/anki/blob/main/docs/development.md
 [env-var]: https://github.com/ankitects/anki/blob/main/docs/development.md#environmental-variables
 [releases]: https://github.com/tnahs/AnkiAssets/releases
